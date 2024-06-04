@@ -59,17 +59,6 @@ mvnw
 mvnw.cmd
 
 #################
-## Gradle
-#################
-
-build
-gradle
-
-# Wrapper files
-gradlew
-gradlew.bat
-
-#################
 ## Visual Studio
 #################
 
