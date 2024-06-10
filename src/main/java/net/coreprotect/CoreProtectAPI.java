@@ -168,8 +168,11 @@ public class CoreProtectAPI extends Queue {
             if (parse.length < 13) {
                 return 0;
             }
-
-            return Integer.parseInt(parse[10]);
+            try {
+                return Integer.parseInt(parse[10]);
+            } catch (NumberFormatException e) {
+                return 0;
+            }
         }
 
         public ItemMeta getItemMeta() {
