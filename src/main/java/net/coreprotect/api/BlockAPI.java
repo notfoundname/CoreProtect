@@ -1,5 +1,6 @@
 package net.coreprotect.api;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -38,7 +39,7 @@ public class BlockAPI {
             }
 
             Statement statement = connection.createStatement();
-            String query = "SELECT time,user,action,type,data,blockdata,rolled_back FROM " + ConfigHandler.prefix + "block " + Util.getWidIndex("block") + "WHERE wid = '" + worldId + "' AND x = '" + x + "' AND z = '" + z + "' AND y = '" + y + "' AND time > '" + checkTime + "' ORDER BY rowid DESC";
+            String query = "SELECT time,user,action,type,data,blockdata,metadata,rolled_back FROM " + ConfigHandler.prefix + "block " + Util.getWidIndex("block") + "WHERE wid = '" + worldId + "' AND x = '" + x + "' AND z = '" + z + "' AND y = '" + y + "' AND time > '" + checkTime + "' ORDER BY rowid DESC";
             ResultSet results = statement.executeQuery(query);
 
             while (results.next()) {
@@ -48,6 +49,7 @@ public class BlockAPI {
                 int resultType = results.getInt("type");
                 String resultData = results.getString("data");
                 byte[] resultBlockData = results.getBytes("blockdata");
+                final byte[] resultMetadata = results.getBytes("metadata");
                 String resultRolledBack = results.getString("rolled_back");
                 if (ConfigHandler.playerIdCacheReversed.get(resultUserId) == null) {
                     UserStatement.loadName(connection, resultUserId);
@@ -55,7 +57,12 @@ public class BlockAPI {
                 String resultUser = ConfigHandler.playerIdCacheReversed.get(resultUserId);
                 String blockData = Util.byteDataToString(resultBlockData, resultType);
 
-                String[] lookupData = new String[] { resultTime, resultUser, String.valueOf(x), String.valueOf(y), String.valueOf(z), String.valueOf(resultType), resultData, resultAction, resultRolledBack, String.valueOf(worldId), blockData };
+                final String metadata = resultMetadata != null ? new String(resultMetadata, StandardCharsets.ISO_8859_1) : "";
+
+                String[] lookupData = new String[] { resultTime, resultUser,
+                        String.valueOf(x), String.valueOf(y), String.valueOf(z),
+                        String.valueOf(resultType), resultData, resultAction, resultRolledBack,
+                        String.valueOf(worldId), blockData, metadata, "" };
                 String[] lineData = Util.toStringArray(lookupData);
                 result.add(lineData);
             }
